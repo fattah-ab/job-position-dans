@@ -1,41 +1,43 @@
 const axios = require('axios');
 const JOB_URL = process.env.JOB_URL;
+const log = require('../helpers/log');
+const response = require('../helpers/response')
 
 class JobPositionController {
     static async getJobPosition(req, res, next) {
         try {
             const job = await axios.get(`${JOB_URL}`)
 
-            res.status(200).json({
-                success: true,
-                message: "Success retrive Job Position list",
-                data: job.data,
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api getJobPosition');
+            res.status(200).json(response.successRes("Success retrive Job Position list", job.data));
+
         } catch (err) {
-            console.log(err)
+            log.error(err + " - Api getJobPosition")
             next(err)
         }
     }
 
     static async getJobPositionPage(req, res, next) {
         try {
-            const job = await axios.get(`${JOB_URL}`)
+            const jobFind = await axios.get(`${JOB_URL}`)
 
             const { page } = req.query;
             const limit = 5;
             const startIndex = (page - 1) * limit;
             const endIndex = page * limit;
-            const result = job.data.slice(startIndex - endIndex)
+            const result = jobFind.data.slice(startIndex - endIndex)
             
-            res.status(200).json({
-                success: true,
-                message: "Success retrive Job Position list page",
-                pages: Math.ceil(job.data.length / limit),
-                current: page,
+            const job = {
+                pages: Math.ceil(jobFind.data.length / limit),
+                curent: page,
                 data: result
-            });
+            }
+
+            log.info(req.clientIp + ' - ' + 'Success Access Api getJobPositionPage');
+            res.status(200).json(response.successRes("Success retrive Job Position list page", job));
+
         } catch (err) {
-            console.log(err)
+            log.error(err + " - Api getJobPositionPage")
             next(err)
         }
     }
@@ -54,13 +56,11 @@ class JobPositionController {
                 }
             }
             
-            res.status(200).json({
-                success: true,
-                message: "Success retrive Job Position by Id",
-                data: detail[0],
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api getDetailJobPosition');
+            res.status(200).json(response.successRes("Success retrive Job Position by Id", detail[0]));
+
         } catch (err) {
-            console.log(err)
+            log.error(err + " - Api getDetailJobPosition")
             next(err)
         }
     }
@@ -78,12 +78,11 @@ class JobPositionController {
                 }
             });
 
-            res.status(200).json({
-                success: true,
-                message: "Success retrive Job Position by Description",
-                data: detail,
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api getJobPositionByDescription');
+            res.status(200).json(response.successRes("Success retrive Job Position by Description", detail));
+
         } catch (err) {
+            log.error(err + " - Api getJobPositionByDescription")
             next(err)
         }
     }
@@ -101,12 +100,11 @@ class JobPositionController {
                 }
             });
 
-            res.status(200).json({
-                success: true,
-                message: "Success retrive Job Position by Location",
-                data: detail,
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api getJobPositionByLocation');
+            res.status(200).json(response.successRes("Success retrive Job Position by Location", detail));
+
         } catch (err) {
+            log.error(err + " - Api getJobPositionByLocation")
             next(err)
         }
     }
@@ -124,12 +122,11 @@ class JobPositionController {
                 }
             });
 
-            res.status(200).json({
-                success: true,
-                message: "Success retrive Job Position by Title",
-                data: detail,
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api getJobPositionByTitle');
+            res.status(200).json(response.successRes("Success retrive Job Position by Title", detail));
+
         } catch (err) {
+            log.error(err + " - Api getJobPositionByTitle")
             next(err)
         }
     }

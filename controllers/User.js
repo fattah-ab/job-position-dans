@@ -1,6 +1,8 @@
 const { User } = require('../models/user');
 const { tokenGenerator } = require('../helpers/jwt');
 const { decryptPassword } = require('../helpers/bcrypt');
+const log = require('../helpers/log');
+const response = require('../helpers/response');
 
 class UserController {
     static async register(req, res, next) {
@@ -13,13 +15,14 @@ class UserController {
 
             let result = await User.create(obj);
             const access_token = tokenGenerator(result);
-            res.status(200).json({
-                success: true,
-                message: "Successfully registered!",
-                user: result,
-                access_token
-            });
+
+            const user = { result, access_token }
+
+            log.info(req.clientIp + ' - ' + 'Success Access Api register - Success Register');
+            res.status(201).json(response.successRes("Successfully registered!", user));
+
         } catch (err) {
+            log.error(err + " - Api register")
             next(err);
         }
     }
@@ -36,35 +39,34 @@ class UserController {
             if (decryptPassword(password, find.password)) {
                 const access_token = tokenGenerator(find);
                 const user = {
-                    username : find.username,
-                    email : find.email
-                }
-                res.status(200).json({
-                    success: true,
-                    message: "Login success!",
-                    user : user,
+                    username: find.username,
+                    email: find.email,
                     access_token
-                });
+                }
+
+                log.info(req.clientIp + ' - ' + 'Success Access Api login - Success login');
+                res.status(200).json(response.successRes("Successfully login!", user));
+
             } else {
                 next({ message: "Password incorrect!" })
             }
         } catch (err) {
+            log.error(err + " - Api login")
             next(err);
         }
     }
 
     static async getUser(req, res, next) {
         try {
-            let result = await User
+            let user = await User
                 .find()
                 .select("-password")
 
-            res.status(200).json({
-                success: true,
-                message: "Successfully showing all users!",
-                data: result
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api getUser');
+            res.status(200).json(response.successRes("Successfully showing all users!", user));
+
         } catch (err) {
+            log.error(err + " - Api getUser")
             next(err);
         }
     }
@@ -73,15 +75,14 @@ class UserController {
         try {
             const { username } = req.userData;
             const user = await User
-                .findOne({username})
+                .findOne({ username })
                 .select('-password')
 
-            res.status(200).json({
-                success: true,
-                message: "Successfully showing user!",
-                data: user
-            });
+            log.info(req.clientIp + ' - ' + 'Success Access Api detailUser');
+            res.status(200).json(response.successRes("Successfully showing user!", user));
+
         } catch (err) {
+            log.error(err + " - Api detailUser")
             next(err);
         }
     }
